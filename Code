@@ -1,0 +1,109 @@
+#include <Servo.h>
+
+Servo myServo;
+
+// Joystick
+const int xPin = A0;
+const int yPin = A1;
+const int swPin = 2;
+
+// Servo
+const int servoPin = 9;
+
+// Fan transistor
+const int fanPin = 6;
+
+// Fan state
+bool fanOn = false;
+
+// Button debounce
+int buttonState = HIGH;
+int lastButtonReading = HIGH;
+unsigned long lastDebounceTime = 0;
+const unsigned long debounceDelay = 50;
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(swPin, INPUT_PULLUP);
+  pinMode(fanPin, OUTPUT);
+
+  digitalWrite(fanPin, LOW);   // fan starts OFF
+
+  myServo.attach(servoPin);
+  myServo.write(90);           // start servo centered
+
+  Serial.println("JOYSTICK + SERVO + FAN STARTED");
+}
+
+void loop() {
+
+  // -------------------------
+  // READ JOYSTICK
+  // -------------------------
+  int xValue = analogRead(xPin);
+  int yValue = analogRead(yPin);
+
+  // Convert joystick X to servo angle
+  int servoAngle = map(xValue, 0, 1023, 0, 180);
+
+  servoAngle = constrain(servoAngle, 0, 180);
+
+  // Move servo
+  myServo.write(servoAngle);
+
+
+  // -------------------------
+  // JOYSTICK BUTTON / FAN
+  // -------------------------
+  int reading = digitalRead(swPin);
+
+  if (reading != lastButtonReading) {
+    lastDebounceTime = millis();
+  }
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+
+    if (reading != buttonState) {
+      buttonState = reading;
+
+      // Button was just pressed
+      if (buttonState == LOW) {
+
+        fanOn = !fanOn;
+
+        if (fanOn) {
+          digitalWrite(fanPin, HIGH);
+        } else {
+          digitalWrite(fanPin, LOW);
+        }
+      }
+    }
+  }
+
+  lastButtonReading = reading;
+
+
+  // -------------------------
+  // SERIAL MONITOR
+  // -------------------------
+  Serial.print("X: ");
+  Serial.print(xValue);
+
+  Serial.print("   Y: ");
+  Serial.print(yValue);
+
+  Serial.print("   SERVO: ");
+  Serial.print(servoAngle);
+  Serial.print(" degrees");
+
+  Serial.print("   FAN: ");
+
+  if (fanOn) {
+    Serial.println("ON");
+  } else {
+    Serial.println("OFF");
+  }
+
+  delay(15);
+}
