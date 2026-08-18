@@ -1,6 +1,19 @@
 # arduino-joystick-servo-fan
 Arduino Uno project using a joystick to control an SG90 servo and toggle a 5V fan through a 2N2222A transistor.
 
+##Demo
+
+
+https://github.com/user-attachments/assets/22b54b09-392a-4bfa-9032-a74b432c9780
+
+
+https://github.com/user-attachments/assets/2426313a-76fb-4bd2-ad0a-ce30d578dec9
+
+
+
+
+
+
 Joystick-Controlled Rotating Fan
 Project Overview
 
